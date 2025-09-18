@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { Mail, Phone, MapPin, Send } from 'lucide-react'
 
 export default function Contact() {
@@ -25,43 +26,75 @@ export default function Contact() {
   }
 
   return (
-    <div className='container mx-auto px-4 py-12'>
-      <div className='mx-auto max-w-6xl'>
-        <h1 className='mb-8 text-4xl font-bold'>Get In Touch</h1>
+    <div className='min-h-screen'>
+      {/* Hero Section with Wave Image */}
+      <div className='relative h-96 overflow-hidden'>
+        <Image
+          src='/images/port-auray-saint-goustan-morbihan-bretagne-12.jpg'
+          alt='Japanese Wave'
+          fill
+          className='object-cover'
+          priority
+        />
+        <div className='absolute inset-0 bg-black/40' />
+        <div className='absolute inset-0 flex items-center justify-center'>
+          <div className='text-center text-white'>
+            <h1 className='mb-4 text-5xl font-bold lg:text-6xl'>Get In Touch</h1>
+            <p className='text-xl opacity-90'>Let's create something amazing together</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Contact Content */}
+      <div className='container mx-auto px-4 py-16'>
+        <div className='mx-auto max-w-6xl'>
         
         <div className='grid gap-12 lg:grid-cols-2'>
-          {/* Contact Information */}
-          <div>
-            <h2 className='mb-6 text-2xl font-semibold'>Let's Connect</h2>
-            <p className='mb-8 text-lg text-muted-foreground'>
-              I'm always interested in new opportunities and exciting projects. 
-              Whether you have a question or just want to say hi, I'll try my best to get back to you!
-            </p>
+          {/* Contact Information with Wave Image */}
+          <div className='space-y-8'>
+            <div>
+              <h2 className='mb-6 text-2xl font-semibold'>Let's Connect</h2>
+              <p className='mb-8 text-lg text-muted-foreground'>
+                I'm always interested in new opportunities and exciting projects. 
+                Whether you have a question or just want to say hi, I'll try my best to get back to you!
+              </p>
+              
+              <div className='space-y-6'>
+                <div className='flex items-center space-x-4'>
+                  <Mail className='h-6 w-6 text-primary' />
+                  <div>
+                    <p className='font-medium'>Email</p>
+                    <p className='text-muted-foreground'>thomasberrod42+pf@gmail.com</p>
+                  </div>
+                </div>
+                
+                <div className='flex items-center space-x-4'>
+                  <Phone className='h-6 w-6 text-primary' />
+                  <div>
+                    <p className='font-medium'>Phone</p>
+                    <p className='text-muted-foreground'>Available upon request</p>
+                  </div>
+                </div>
+                
+                <div className='flex items-center space-x-4'>
+                  <MapPin className='h-6 w-6 text-primary' />
+                  <div>
+                    <p className='font-medium'>Location</p>
+                    <p className='text-muted-foreground'>Auray & remote work</p>
+                  </div>
+                </div>
+              </div>
+            </div>
             
-            <div className='space-y-6'>
-              <div className='flex items-center space-x-4'>
-                <Mail className='h-6 w-6 text-primary' />
-                <div>
-                  <p className='font-medium'>Email</p>
-                  <p className='text-muted-foreground'>contact@thomasberrod.dev</p>
-                </div>
-              </div>
-              
-              <div className='flex items-center space-x-4'>
-                <Phone className='h-6 w-6 text-primary' />
-                <div>
-                  <p className='font-medium'>Phone</p>
-                  <p className='text-muted-foreground'>Available upon request</p>
-                </div>
-              </div>
-              
-              <div className='flex items-center space-x-4'>
-                <MapPin className='h-6 w-6 text-primary' />
-                <div>
-                  <p className='font-medium'>Location</p>
-                  <p className='text-muted-foreground'>Available for remote work</p>
-                </div>
-              </div>
+            {/* Wave Image */}
+            <div className='relative h-64 w-full overflow-hidden rounded-lg border border-border/50'>
+              <Image
+                src='/images/waveJapan.jpg'
+                alt='Japanese Wave'
+                fill
+                className='object-cover'
+                sizes='(max-width: 768px) 100vw, 50vw'
+              />
             </div>
           </div>
           
@@ -143,6 +176,7 @@ export default function Contact() {
               </button>
             </form>
           </div>
+        </div>
         </div>
       </div>
     </div>

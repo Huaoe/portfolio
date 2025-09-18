@@ -1,33 +1,71 @@
 'use client'
 
-import { Suspense, useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Scene } from '@/components/three/scene'
-import { WebGLFallback } from '@/components/three/webgl-fallback'
+import Image from 'next/image'
 import { ArrowRight, Download } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
-const SceneWithFallback = () => {
-  const [webglSupported, setWebglSupported] = useState(true)
-
+// Matrix-style text effect component
+const MatrixText = ({ children }: { children: string }) => {
+  const [displayText, setDisplayText] = useState('')
+  const [isAnimating, setIsAnimating] = useState(false)
+  
+  const matrixChars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン'
+  
   useEffect(() => {
-    // Check WebGL support
-    try {
-      const canvas = document.createElement('canvas')
-      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
-      if (!gl) {
-        setWebglSupported(false)
+    let timeouts: NodeJS.Timeout[] = []
+    
+    const animateText = () => {
+      setIsAnimating(true)
+      const targetText = children
+      let currentIndex = 0
+      
+      const revealChar = () => {
+        if (currentIndex < targetText.length) {
+          // Show random characters first
+          let iterations = 0
+          const scrambleInterval = setInterval(() => {
+            setDisplayText(prev => {
+              const scrambled = targetText
+                .split('')
+                .map((char, index) => {
+                  if (index < currentIndex) return char
+                  if (index === currentIndex && iterations > 8) return char
+                  return matrixChars[Math.floor(Math.random() * matrixChars.length)]
+                })
+                .join('')
+              return scrambled
+            })
+            
+            iterations++
+            if (iterations > 10) {
+              clearInterval(scrambleInterval)
+              currentIndex++
+              timeouts.push(setTimeout(revealChar, 50))
+            }
+          }, 30)
+        } else {
+          setIsAnimating(false)
+        }
       }
-    } catch (e) {
-      setWebglSupported(false)
+      
+      revealChar()
     }
-  }, [])
-
-  if (!webglSupported) {
-    return <WebGLFallback />
-  }
-
-  return <Scene />
+    
+    // Start animation after a delay
+    const startTimeout = setTimeout(animateText, 1000)
+    timeouts.push(startTimeout)
+    
+    return () => {
+      timeouts.forEach(timeout => clearTimeout(timeout))
+    }
+  }, [children])
+  
+  return (
+    <span className={`inline-block font-mono ${isAnimating ? 'text-green-400' : ''} transition-colors duration-300`}>
+      {displayText || children}
+    </span>
+  )
 }
 
 export default function Home() {
@@ -35,47 +73,110 @@ export default function Home() {
     <main className='flex min-h-screen flex-col'>
       {/* Hero Section with 3D Scene */}
       <section className='relative flex h-screen w-full items-center justify-center overflow-hidden'>
-        {/* Animated Background */}
+        {/* Enhanced Animated Background */}
         <div className='absolute inset-0 z-0'>
-          <div className='h-full w-full bg-gradient-to-br from-background via-background to-muted'>
-            <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]'></div>
+          <div className='h-full w-full bg-gradient-to-br from-background via-background to-muted overflow-hidden'>
+            {/* Gradient overlays */}
+            <div className='absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.15),transparent_50%)]'></div>
+            <div className='absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(168,85,247,0.1),transparent_50%)]'></div>
+            
+            {/* Floating geometric shapes */}
             <div className='absolute inset-0'>
-              <div className='absolute top-1/4 left-1/4 h-32 w-32 rounded-full bg-primary/20 blur-xl animate-pulse'></div>
-              <div className='absolute top-3/4 right-1/4 h-24 w-24 rounded-full bg-secondary/30 blur-lg animate-pulse delay-1000'></div>
-              <div className='absolute top-1/2 right-1/3 h-16 w-16 rounded-full bg-accent/25 blur-md animate-pulse delay-2000'></div>
-            </div>
+              {/* Large floating cube with your picture */}
+              <div className='absolute top-1/4 left-1/4 h-32 w-32 rounded-lg rotate-8 animate-float perspective-1500'>
+                <div className='relative h-full w-full transform-style-preserve-3d hover:rotate-y-180 transition-transform duration-700'>
+                  {/* Front face */}
+                  <div className='absolute inset-0 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 backface-hidden'>
+                    <div className='h-full w-full rounded-lg overflow-hidden p-2'>
+                      <Image
+                        src='/thomasPict.jpg'
+                        alt='Thomas Berrod'
+                        width={120}
+                        height={120}
+                        className='h-full w-full object-cover rounded-md'
+                        priority
+                      />
+                    </div>
+                  </div>
+                  {/* Back face */}
+                  <div className='absolute inset-0 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/5 border border-purple-500/20 backface-hidden rotate-y-180 flex items-center justify-center'>
+                    <span className='text-xs font-semibold text-primary'>Thomas B.</span>
+                  </div>
+                </div>
+              </div>
+              
+
+              {/* Additional decorative elements */}
+   </div>
+            
+            {/* Grid pattern overlay */}
+            <div className='absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_at_center,black_50%,transparent_100%)]'></div>
           </div>
         </div>
         
         {/* Content Overlay */}
         <div className='relative z-10 container mx-auto px-4 text-center'>
-          <div className='mx-auto max-w-4xl'>
-            <h1 className='mb-6 text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl'>
-              Thomas Berrod
+          <div className='mx-auto max-w-5xl'>
+            {/* Animated greeting */}
+            <div className='mb-4 opacity-0 animate-fade-in-up'>
+              <span className='inline-block rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary'>
+                👋 Welcome to my portfolio
+              </span>
+            </div>
+            
+            {/* Main heading with gradient text */}
+            <h1 className='mb-6 text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl opacity-0 animate-fade-in-up animation-delay-200'>
+              <span className='bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent'>
+                Thomas Berrod
+              </span>
             </h1>
-            <p className='mb-8 text-xl text-muted-foreground sm:text-2xl lg:text-3xl'>
-              Full Stack Developer & Web3 Innovator
+            
+            {/* Subtitle with typing effect */}
+            <p className='mb-8 text-xl text-muted-foreground sm:text-2xl lg:text-3xl opacity-0 animate-fade-in-up animation-delay-400'>
+              Full Stack Developer & 
+              <span className='bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent font-semibold'>
+                {' '}Web3 Innovator
+              </span>
             </p>
-            <p className='mx-auto mb-10 max-w-2xl text-lg text-muted-foreground'>
-              Crafting innovative web experiences with React.js, TypeScript, Three.js, and Web3 technologies.
+            
+            {/* Description */}
+            <p className='mx-auto mb-10 max-w-3xl text-lg text-muted-foreground leading-relaxed opacity-0 animate-fade-in-up animation-delay-600'>
+              Crafting innovative web experiences with{' '}
+              <span className='font-semibold text-foreground'>React.js</span>,{' '}
+              <span className='font-semibold text-foreground'>TypeScript</span>,{' '}
+              <span className='font-semibold text-foreground'>Three.js</span>, and{' '}
+              <span className='font-semibold text-foreground'>Web3</span> technologies.
+              <br />
               Specializing in modern, responsive applications with cutting-edge AI integration.
             </p>
             
+            {/* Tech stack badges */}
+            <div className='mb-10 flex flex-wrap justify-center gap-3 opacity-0 animate-fade-in-up animation-delay-800'>
+              {['React.js', 'TypeScript', 'Python','C#.Net', 'SQL', 'Web3', 'AI/ML'].map((tech) => (
+                <span 
+                  key={tech}
+                  className='rounded-full bg-secondary/50 px-4 py-2 text-sm font-medium text-secondary-foreground backdrop-blur-sm border border-border/50 hover:bg-secondary/70 transition-colors'
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+            
             {/* CTA Buttons */}
-            <div className='flex flex-col gap-4 sm:flex-row sm:justify-center'>
+            <div className='flex flex-col gap-4 sm:flex-row sm:justify-center opacity-0 animate-fade-in-up animation-delay-1000'>
               <Link 
                 href='/projects'
-                className='inline-flex items-center justify-center rounded-md bg-primary px-8 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring group'
+                className='inline-flex items-center justify-center rounded-md bg-primary px-8 py-4 text-base font-medium text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:shadow-xl hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group'
               >
                 View My Work
-                <ArrowRight className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' />
+                <ArrowRight className='ml-2 h-5 w-5 transition-transform group-hover:translate-x-1' />
               </Link>
               <Link 
-                href='/resume.pdf' 
+                href='/Thomas_Berrod_CV_2025_EN.pdf' 
                 target='_blank'
-                className='inline-flex items-center justify-center rounded-md border border-input bg-background px-8 py-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+                className='inline-flex items-center justify-center rounded-md border border-input bg-background/50 backdrop-blur-sm px-8 py-4 text-base font-medium shadow-lg transition-all hover:bg-accent hover:text-accent-foreground hover:shadow-xl hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
               >
-                <Download className='mr-2 h-4 w-4' />
+                <Download className='mr-2 h-5 w-5' />
                 Download Resume
               </Link>
             </div>
@@ -95,7 +196,8 @@ export default function Home() {
         <div className='container mx-auto px-4 text-center'>
           <h2 className='mb-8 text-3xl font-bold'>About Me</h2>
           <p className='mx-auto max-w-3xl text-lg text-muted-foreground'>
-            I'm a passionate full-stack developer with expertise in modern web technologies. 
+            I'm a passionate full-stack developer with expertise in{' '}
+            <br></br>  <MatrixText>modern web technologies</MatrixText>. <br></br>
             I love creating immersive digital experiences that push the boundaries of what's possible on the web.
           </p>
         </div>
