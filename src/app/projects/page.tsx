@@ -7,7 +7,6 @@ import { ExternalLink, Github, Eye, Filter, Search } from 'lucide-react'
 const projects = [
   {
     id: 1,
-    liveUrl: 'https://we.deploy.science/',
     title: 'Dalma Frontend Development',
     description: 'Led frontend development team at Dalma, building cross-device mobile apps from scratch and managing offshore testing teams. Refactored subscription flows and implemented cutting-edge technologies in a Scrum environment.',
     image: '/images/Dalma.png',
