@@ -1,7 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { Code2, Database, Blocks, Wrench, Brain, Palette } from 'lucide-react'
+
+// Dynamic import for Three.js component to avoid SSR issues
+const SkillsHero = dynamic(() => import('@/components/three/SkillsHero'), {
+  ssr: false,
+  loading: () => <div className="h-[60vh] bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 animate-pulse" />
+})
 
 const skillCategories = [
   {
@@ -87,16 +94,13 @@ export default function Skills() {
   }, [])
 
   return (
-    <div className='container mx-auto px-4 py-12'>
-      <div className='mx-auto max-w-7xl'>
-        {/* Header */}
-        <div className='mb-16 text-center'>
-          <h1 className='mb-6 text-4xl font-bold lg:text-5xl'>Skills & Expertise</h1>
-          <p className='mx-auto max-w-3xl text-xl text-muted-foreground leading-relaxed'>
-            A comprehensive overview of my technical skills, proficiency levels, and areas of expertise
-            across the full stack of modern web development.
-          </p>
-        </div>
+    <div className='min-h-screen'>
+      {/* Three.js Animated Header */}
+      <SkillsHero />
+      
+      {/* Skills Content */}
+      <div className='container mx-auto px-4 py-16'>
+        <div className='mx-auto max-w-7xl'>
 
         {/* Skills Grid */}
         <div className='grid gap-8 lg:grid-cols-2'>
@@ -178,6 +182,7 @@ export default function Skills() {
             <div className='text-3xl font-bold text-orange-500 mb-2'>85%</div>
             <div className='text-sm text-muted-foreground'>Avg. Proficiency</div>
           </div>
+        </div>
         </div>
       </div>
     </div>

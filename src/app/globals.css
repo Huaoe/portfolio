@@ -151,6 +151,10 @@
   animation-delay: 1s;
 }
 
+.animation-delay-300 {
+  animation-delay: 0.3s;
+}
+
 /* Shimmer effect for skill bars */
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
