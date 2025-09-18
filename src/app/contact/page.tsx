@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Mail, Phone, MapPin, Send } from 'lucide-react'
+import emailjs from '@emailjs/browser'
+import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -11,11 +12,48 @@ export default function Contact() {
     subject: '',
     message: ''
   })
+  
+  const [isLoading, setIsLoading] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Form submission logic will be implemented later
-    console.log('Form submitted:', formData)
+    setIsLoading(true)
+    setSubmitStatus('idle')
+    setErrorMessage('')
+
+    try {
+      // EmailJS configuration - you'll need to replace these with your actual values
+      const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'your_service_id'
+      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'your_template_id'
+      const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'your_public_key'
+
+      const templateParams = {
+        from_name: formData.name,
+        from_email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        to_name: 'Thomas Berrod', // Your name
+      }
+
+      await emailjs.send(serviceId, templateId, templateParams, publicKey)
+      
+      setSubmitStatus('success')
+      // Reset form after successful submission
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      })
+    } catch (error) {
+      console.error('EmailJS error:', error)
+      setSubmitStatus('error')
+      setErrorMessage('Failed to send message. Please try again or contact me directly.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -169,11 +207,36 @@ export default function Contact() {
               
               <button
                 type='submit'
-                className='inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+                disabled={isLoading}
+                className='inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed'
               >
-                <Send className='mr-2 h-4 w-4' />
-                Send Message
+                {isLoading ? (
+                  <>
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className='mr-2 h-4 w-4' />
+                    Send Message
+                  </>
+                )}
               </button>
+              
+              {/* Success/Error Messages */}
+              {submitStatus === 'success' && (
+                <div className='flex items-center gap-2 rounded-md bg-green-50 p-3 text-green-800 border border-green-200'>
+                  <CheckCircle className='h-5 w-5' />
+                  <span>Message sent successfully! I'll get back to you soon.</span>
+                </div>
+              )}
+              
+              {submitStatus === 'error' && (
+                <div className='flex items-center gap-2 rounded-md bg-red-50 p-3 text-red-800 border border-red-200'>
+                  <AlertCircle className='h-5 w-5' />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
             </form>
           </div>
         </div>
