@@ -3,7 +3,14 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import emailjs from '@emailjs/browser'
-import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle, Loader2, Shield } from 'lucide-react'
+
+// @ts-ignore - Temporary fix for TypeScript compatibility
+const ReCAPTCHA = dynamic(() => import('react-google-recaptcha'), {
+  ssr: false,
+  loading: () => <div className="h-20 w-80 bg-gray-100 animate-pulse rounded"></div>
+})
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -16,12 +23,21 @@ export default function Contact() {
   const [isLoading, setIsLoading] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+  const [captchaValue, setCaptchaValue] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setSubmitStatus('idle')
     setErrorMessage('')
+
+    // Check if CAPTCHA is completed
+    if (!captchaValue) {
+      setSubmitStatus('error')
+      setErrorMessage('Please complete the CAPTCHA verification.')
+      setIsLoading(false)
+      return
+    }
 
     try {
       // EmailJS configuration - you'll need to replace these with your actual values
@@ -47,10 +63,14 @@ export default function Contact() {
         subject: '',
         message: ''
       })
+      // Reset CAPTCHA
+      setCaptchaValue(null)
     } catch (error) {
       console.error('EmailJS error:', error)
       setSubmitStatus('error')
       setErrorMessage('Failed to send message. Please try again or contact me directly.')
+      // Reset CAPTCHA on error
+      setCaptchaValue(null)
     } finally {
       setIsLoading(false)
     }
@@ -202,6 +222,20 @@ export default function Contact() {
                   rows={6}
                   className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
                   placeholder='Your message...'
+                />
+              </div>
+              
+              {/* reCAPTCHA */}
+              <div className='flex flex-col items-center space-y-2'>
+                <div className='flex items-center gap-2 text-sm text-muted-foreground mb-2'>
+                  <Shield className='h-4 w-4' />
+                  <span>Security verification required</span>
+                </div>
+                <ReCAPTCHA
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || 'your_site_key_here'}
+                  onChange={(value) => setCaptchaValue(value)}
+                  onExpired={() => setCaptchaValue(null)}
+                  theme='light'
                 />
               </div>
               
