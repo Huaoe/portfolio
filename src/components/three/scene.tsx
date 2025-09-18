@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Environment, ContactShadows } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
 import { FloatingCube } from '@/components/three/floating-cube'
 import { SceneLoader } from '@/components/three/scene-loader'
 
@@ -21,8 +21,15 @@ export const Scene = ({ className = '' }: SceneProps) => {
           far: 1000,
         }}
         shadows
-        gl={{ antialias: true, alpha: true }}
-        dpr={[1, 2]}
+        gl={{ 
+          antialias: true, 
+          alpha: true,
+          powerPreference: 'high-performance',
+          stencil: false,
+          depth: false
+        }}
+        dpr={[1, Math.min(window.devicePixelRatio, 2)]}
+        performance={{ min: 0.5 }}
       >
         <Suspense fallback={<SceneLoader />}>
           {/* Lighting */}
@@ -36,20 +43,14 @@ export const Scene = ({ className = '' }: SceneProps) => {
           />
           <pointLight position={[-10, -10, -10]} intensity={0.5} />
 
-          {/* Environment */}
-          <Environment preset="city" />
-          
           {/* 3D Objects */}
           <FloatingCube />
           
-          {/* Ground */}
-          <ContactShadows
-            position={[0, -2, 0]}
-            opacity={0.4}
-            scale={10}
-            blur={1.5}
-            far={4.5}
-          />
+          {/* Simple ground plane */}
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2, 0]} receiveShadow>
+            <planeGeometry args={[10, 10]} />
+            <meshStandardMaterial color="#f1f5f9" opacity={0.3} transparent />
+          </mesh>
           
           {/* Controls */}
           <OrbitControls

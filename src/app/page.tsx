@@ -1,25 +1,50 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Scene } from '@/components/three/scene'
+import { WebGLFallback } from '@/components/three/webgl-fallback'
 import { ArrowRight, Download } from 'lucide-react'
+
+const SceneWithFallback = () => {
+  const [webglSupported, setWebglSupported] = useState(true)
+
+  useEffect(() => {
+    // Check WebGL support
+    try {
+      const canvas = document.createElement('canvas')
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+      if (!gl) {
+        setWebglSupported(false)
+      }
+    } catch (e) {
+      setWebglSupported(false)
+    }
+  }, [])
+
+  if (!webglSupported) {
+    return <WebGLFallback />
+  }
+
+  return <Scene />
+}
 
 export default function Home() {
   return (
     <main className='flex min-h-screen flex-col'>
       {/* Hero Section with 3D Scene */}
       <section className='relative flex h-screen w-full items-center justify-center overflow-hidden'>
-        {/* 3D Background */}
+        {/* Animated Background */}
         <div className='absolute inset-0 z-0'>
-          <Suspense fallback={
-            <div className='flex h-full items-center justify-center'>
-              <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent'></div>
+          <div className='h-full w-full bg-gradient-to-br from-background via-background to-muted'>
+            <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]'></div>
+            <div className='absolute inset-0'>
+              <div className='absolute top-1/4 left-1/4 h-32 w-32 rounded-full bg-primary/20 blur-xl animate-pulse'></div>
+              <div className='absolute top-3/4 right-1/4 h-24 w-24 rounded-full bg-secondary/30 blur-lg animate-pulse delay-1000'></div>
+              <div className='absolute top-1/2 right-1/3 h-16 w-16 rounded-full bg-accent/25 blur-md animate-pulse delay-2000'></div>
             </div>
-          }>
-            <Scene />
-          </Suspense>
+          </div>
         </div>
         
         {/* Content Overlay */}
