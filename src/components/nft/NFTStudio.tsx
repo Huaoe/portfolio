@@ -334,14 +334,15 @@ export default function NFTStudio() {
           <div className="p-4 rounded-xl bg-muted/50 border border-border/50">
             <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
               <Zap className="h-4 w-4 text-primary" />
-              AI Generation Info
+              AI Generation & Storage Info
             </h4>
             <ul className="text-xs text-muted-foreground space-y-1">
               <li>• Uses Stable Diffusion AI model</li>
               <li>• Based on your portrait as foundation</li>
               <li>• Generation takes 30-60 seconds</li>
-              <li>• Stored permanently on Arweave</li>
-              <li>• Results can be minted as NFTs</li>
+              <li>• Stored permanently on Arweave blockchain</li>
+              <li>• Images and metadata are immutable</li>
+              <li>• Results can be minted as NFTs on Hoodi Network</li>
             </ul>
           </div>
 

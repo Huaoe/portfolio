@@ -10,6 +10,36 @@ export const arweave = Arweave.init({
   logging: ARWEAVE_CONFIG.logging,
 })
 
+// Load wallet from file (server-side only)
+let walletKey: any = null
+
+export const loadWallet = async () => {
+  if (typeof window !== 'undefined') {
+    throw new Error('Wallet loading should only happen on server-side')
+  }
+  
+  if (!walletKey) {
+    try {
+      // In production, load from environment variable or secure storage
+      if (process.env.ARWEAVE_WALLET_KEY) {
+        walletKey = JSON.parse(process.env.ARWEAVE_WALLET_KEY)
+      } else {
+        // For development, load from local file
+        const fs = await import('fs')
+        const path = await import('path')
+        const walletPath = path.join(process.cwd(), 'm9IQRGB5bDhqbSPsRztxRS4E0SCuosig52-Cs-j27HE.json')
+        const walletData = fs.readFileSync(walletPath, 'utf8')
+        walletKey = JSON.parse(walletData)
+      }
+    } catch (error) {
+      console.error('Failed to load Arweave wallet:', error)
+      throw new Error('Arweave wallet not found or invalid')
+    }
+  }
+  
+  return walletKey
+}
+
 // NFT Metadata interface
 export interface NFTMetadata {
   name: string
@@ -23,12 +53,14 @@ export interface NFTMetadata {
   animation_url?: string
 }
 
-// Upload image to Arweave
+// Upload image to Arweave (server-side)
 export async function uploadImageToArweave(
   imageBlob: Blob,
   filename: string
 ): Promise<string> {
   try {
+    const wallet = await loadWallet()
+    
     // Convert blob to buffer
     const arrayBuffer = await imageBlob.arrayBuffer()
     const data = new Uint8Array(arrayBuffer)
@@ -36,7 +68,7 @@ export async function uploadImageToArweave(
     // Create transaction
     const transaction = await arweave.createTransaction({
       data: data,
-    })
+    }, wallet)
 
     // Add tags
     transaction.addTag('Content-Type', imageBlob.type)
@@ -44,30 +76,37 @@ export async function uploadImageToArweave(
     transaction.addTag('Type', 'image')
     transaction.addTag('File-Name', filename)
 
-    // Sign and post transaction (this would require a wallet key)
-    // For client-side, we'll use a different approach with bundlr or similar
+    // Sign transaction
+    await arweave.transactions.sign(transaction, wallet)
     
-    // Return the transaction ID (this would be the Arweave URL)
-    const txId = transaction.id
-    return `${ARWEAVE_CONFIG.gateway}${txId}`
+    // Post transaction
+    const response = await arweave.transactions.post(transaction)
+    
+    if (response.status === 200) {
+      return `${ARWEAVE_CONFIG.gateway}${transaction.id}`
+    } else {
+      throw new Error(`Failed to post transaction: ${response.status}`)
+    }
   } catch (error) {
     console.error('Error uploading image to Arweave:', error)
     throw new Error('Failed to upload image to Arweave')
   }
 }
 
-// Upload metadata to Arweave
+// Upload metadata to Arweave (server-side)
 export async function uploadMetadataToArweave(
   metadata: NFTMetadata
 ): Promise<string> {
   try {
+    const wallet = await loadWallet()
+    
     // Convert metadata to JSON
     const data = JSON.stringify(metadata, null, 2)
 
     // Create transaction
     const transaction = await arweave.createTransaction({
       data: data,
-    })
+    }, wallet)
 
     // Add tags
     transaction.addTag('Content-Type', 'application/json')
@@ -75,9 +114,17 @@ export async function uploadMetadataToArweave(
     transaction.addTag('Type', 'metadata')
     transaction.addTag('Standard', 'ERC-721')
 
-    // Return the transaction ID (this would be the Arweave URL)
-    const txId = transaction.id
-    return `${ARWEAVE_CONFIG.gateway}${txId}`
+    // Sign transaction
+    await arweave.transactions.sign(transaction, wallet)
+    
+    // Post transaction
+    const response = await arweave.transactions.post(transaction)
+    
+    if (response.status === 200) {
+      return `${ARWEAVE_CONFIG.gateway}${transaction.id}`
+    } else {
+      throw new Error(`Failed to post transaction: ${response.status}`)
+    }
   } catch (error) {
     console.error('Error uploading metadata to Arweave:', error)
     throw new Error('Failed to upload metadata to Arweave')
@@ -169,16 +216,50 @@ export function createNFTMetadata(
   }
 }
 
-// Client-side upload using Bundlr (for production)
+// Client-side upload using API routes
 export async function uploadToBundlr(data: string | Uint8Array, contentType: string): Promise<string> {
-  // This would integrate with Bundlr Network for easier Arweave uploads
-  // For now, we'll simulate the upload
-  console.log('Uploading to Bundlr/Arweave...', { contentType })
-  
-  // Simulate upload delay
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  
-  // Return a mock transaction ID
-  const mockTxId = 'mock-arweave-tx-' + Date.now()
-  return `${ARWEAVE_CONFIG.gateway}${mockTxId}`
+  try {
+    if (contentType.startsWith('image/')) {
+      // Upload image via API route
+      const formData = new FormData()
+      const blob = new Blob([data], { type: contentType })
+      formData.append('image', blob, `nft-image-${Date.now()}.${contentType.split('/')[1]}`)
+      formData.append('filename', `nft-image-${Date.now()}`)
+
+      const response = await fetch('/api/arweave/upload-image', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      return result.url
+    } else if (contentType === 'application/json') {
+      // Upload metadata via API route
+      const metadata = JSON.parse(data as string)
+      
+      const response = await fetch('/api/arweave/upload-metadata', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(metadata),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      return result.url
+    } else {
+      throw new Error(`Unsupported content type: ${contentType}`)
+    }
+  } catch (error) {
+    console.error('Error uploading to Arweave:', error)
+    throw new Error('Failed to upload to Arweave')
+  }
 }
