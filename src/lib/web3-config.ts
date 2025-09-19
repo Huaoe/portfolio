@@ -67,9 +67,13 @@ export const NFT_CONTRACT_CONFIG = {
   ]
 } as const
 
-// IPFS Configuration
-export const IPFS_CONFIG = {
-  gateway: 'https://ipfs.io/ipfs/',
-  pinataApiKey: process.env.NEXT_PUBLIC_PINATA_API_KEY,
-  pinataSecretKey: process.env.NEXT_PUBLIC_PINATA_SECRET_KEY,
+// Arweave Configuration
+export const ARWEAVE_CONFIG = {
+  host: 'arweave.net',
+  port: 443,
+  protocol: 'https',
+  timeout: 20000,
+  logging: false,
+  gateway: 'https://arweave.net/',
+  walletKey: process.env.ARWEAVE_WALLET_KEY, // Private key for server-side operations
 }

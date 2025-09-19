@@ -14,10 +14,14 @@ import {
   Eye,
   EyeOff,
   Loader2,
-  Wallet
+  Wallet,
+  CheckCircle,
+  AlertCircle,
+  Upload
 } from 'lucide-react'
 import VisualEffects from './VisualEffects'
 import WalletConnection from '../web3/WalletConnection'
+import { useNFTMinting } from '@/hooks/useNFTMinting'
 
 // Visual effect presets
 const effectPresets = [
@@ -99,6 +103,9 @@ export default function NFTStudio() {
   const [showEffects, setShowEffects] = useState(false)
   const [isWalletConnected, setIsWalletConnected] = useState(false)
   const [studioRef, studioIntersecting, studioHasIntersected] = useIntersectionObserver()
+  
+  // NFT Minting hook
+  const { mintNFT, reset: resetMinting, state: mintingState, isLoading: isMintingLoading } = useNFTMinting()
 
   // Simulate AI image generation (placeholder for Stable Diffusion integration)
   const handleGenerate = async () => {
@@ -127,6 +134,33 @@ export default function NFTStudio() {
     setShowOriginal(true)
     setIsGenerating(false)
     setShowEffects(false)
+    resetMinting()
+  }
+
+  // Handle NFT minting
+  const handleMintNFT = async () => {
+    if (!generatedImage || !isWalletConnected) return
+
+    try {
+      // Convert the generated image to blob
+      const response = await fetch(generatedImage)
+      const imageBlob = await response.blob()
+
+      // Create NFT name and description
+      const nftName = `Thomas Berrod AI Portrait - ${selectedPreset || 'Custom'}`
+      const nftDescription = `AI-generated portrait of Thomas Berrod using ${selectedPreset || 'custom'} style. ${customPrompt || 'Generated with advanced AI techniques.'}`
+
+      // Mint the NFT
+      await mintNFT(
+        imageBlob,
+        nftName,
+        nftDescription,
+        customPrompt || (effectPresets.find(p => p.id === selectedPreset)?.prompt || ''),
+        selectedPreset || 'custom'
+      )
+    } catch (error) {
+      console.error('Error minting NFT:', error)
+    }
   }
 
   return (
@@ -306,9 +340,92 @@ export default function NFTStudio() {
               <li>• Uses Stable Diffusion AI model</li>
               <li>• Based on your portrait as foundation</li>
               <li>• Generation takes 30-60 seconds</li>
+              <li>• Stored permanently on Arweave</li>
               <li>• Results can be minted as NFTs</li>
             </ul>
           </div>
+
+          {/* Minting Status */}
+          {mintingState.step !== 'idle' && (
+            <div className="p-4 rounded-xl bg-muted/50 border border-border/50">
+              <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                <Upload className="h-4 w-4 text-primary" />
+                NFT Minting Progress
+              </h4>
+              <div className="space-y-2">
+                {/* Progress Steps */}
+                <div className="flex items-center gap-2 text-xs">
+                  {mintingState.step === 'uploading-image' ? (
+                    <Loader2 className="h-3 w-3 animate-spin text-blue-500" />
+                  ) : mintingState.step !== 'idle' ? (
+                    <CheckCircle className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <div className="h-3 w-3 rounded-full bg-muted-foreground/30" />
+                  )}
+                  <span className={mintingState.step === 'uploading-image' ? 'text-blue-500' : 'text-muted-foreground'}>
+                    Uploading image to Arweave
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs">
+                  {mintingState.step === 'uploading-metadata' ? (
+                    <Loader2 className="h-3 w-3 animate-spin text-blue-500" />
+                  ) : ['minting', 'confirming', 'complete'].includes(mintingState.step) ? (
+                    <CheckCircle className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <div className="h-3 w-3 rounded-full bg-muted-foreground/30" />
+                  )}
+                  <span className={mintingState.step === 'uploading-metadata' ? 'text-blue-500' : 'text-muted-foreground'}>
+                    Uploading metadata to Arweave
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs">
+                  {mintingState.step === 'minting' ? (
+                    <Loader2 className="h-3 w-3 animate-spin text-blue-500" />
+                  ) : ['confirming', 'complete'].includes(mintingState.step) ? (
+                    <CheckCircle className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <div className="h-3 w-3 rounded-full bg-muted-foreground/30" />
+                  )}
+                  <span className={mintingState.step === 'minting' ? 'text-blue-500' : 'text-muted-foreground'}>
+                    Minting NFT on blockchain
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs">
+                  {mintingState.step === 'confirming' ? (
+                    <Loader2 className="h-3 w-3 animate-spin text-blue-500" />
+                  ) : mintingState.step === 'complete' ? (
+                    <CheckCircle className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <div className="h-3 w-3 rounded-full bg-muted-foreground/30" />
+                  )}
+                  <span className={mintingState.step === 'confirming' ? 'text-blue-500' : 'text-muted-foreground'}>
+                    Confirming transaction
+                  </span>
+                </div>
+
+                {/* Error Display */}
+                {mintingState.error && (
+                  <div className="flex items-center gap-2 text-xs text-red-500">
+                    <AlertCircle className="h-3 w-3" />
+                    {mintingState.error}
+                  </div>
+                )}
+
+                {/* Success Display */}
+                {mintingState.step === 'complete' && mintingState.txHash && (
+                  <div className="mt-2 p-2 rounded bg-green-500/10 border border-green-500/20">
+                    <p className="text-xs text-green-600 font-medium">NFT Minted Successfully!</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Transaction: {mintingState.txHash.slice(0, 10)}...{mintingState.txHash.slice(-8)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Web3 Wallet Connection */}
           <div>
@@ -327,11 +444,24 @@ export default function NFTStudio() {
                 Download
               </button>
               <button 
-                disabled={!isWalletConnected}
+                onClick={handleMintNFT}
+                disabled={!isWalletConnected || isMintingLoading}
                 className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
               >
-                <Share2 className="h-5 w-5" />
-                Mint NFT
+                {isMintingLoading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    {mintingState.step === 'uploading-image' && 'Uploading to Arweave...'}
+                    {mintingState.step === 'uploading-metadata' && 'Creating Metadata...'}
+                    {mintingState.step === 'minting' && 'Minting NFT...'}
+                    {mintingState.step === 'confirming' && 'Confirming...'}
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="h-5 w-5" />
+                    Mint NFT on Arweave
+                  </>
+                )}
               </button>
             </div>
           )}
