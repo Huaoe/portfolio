@@ -44,3 +44,7 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+
+# Arweave wallet files (keep these secure!)
+*.json
+m9IQRGB5bDhqbSPsRztxRS4E0SCuosig52-Cs-j27HE.json
