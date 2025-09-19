@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { ExternalLink, Github, Eye, Filter, Search } from 'lucide-react'
 
@@ -178,11 +178,215 @@ const projects = [
 const categories = ['All', 'E-Commerce', 'Science & Research', 'Web3', 'Health & Wellness', 'Social Platform', 'Civic Tech', 'Education', 'Professional Experience', 'Arduino Dev']
 const statuses = ['All', 'Completed', 'Archived', 'On going']
 
+// Custom hook for intersection observer (reused from About page)
+const useIntersectionObserver = (options = {}) => {
+  const [isIntersecting, setIsIntersecting] = useState(false)
+  const [hasIntersected, setHasIntersected] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsIntersecting(entry.isIntersecting)
+      if (entry.isIntersecting && !hasIntersected) {
+        setHasIntersected(true)
+      }
+    }, {
+      threshold: 0.1,
+      rootMargin: '-50px',
+      ...options
+    })
+
+    if (ref.current) {
+      observer.observe(ref.current)
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current)
+      }
+    }
+  }, [hasIntersected])
+
+  return [ref, isIntersecting, hasIntersected] as const
+}
+
+// Animated counter component for project stats
+const AnimatedCounter = ({ end, duration = 2000, suffix = '' }: { end: number, duration?: number, suffix?: string }) => {
+  const [count, setCount] = useState(0)
+  const [ref, isIntersecting, hasIntersected] = useIntersectionObserver()
+
+  useEffect(() => {
+    if (hasIntersected) {
+      let startTime: number | null = null
+      const startCount = 0
+      
+      const animate = (currentTime: number) => {
+        if (startTime === null) startTime = currentTime
+        const progress = Math.min((currentTime - startTime) / duration, 1)
+        
+        setCount(Math.floor(progress * end))
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate)
+        }
+      }
+      
+      requestAnimationFrame(animate)
+    }
+  }, [hasIntersected, end, duration])
+
+  return (
+    <div ref={ref} className='text-lg font-bold text-primary'>
+      {count}{suffix}
+    </div>
+  )
+}
+
+// Project card component with animations
+const ProjectCard = ({ project, index, isFeatured = false }: { project: any, index: number, isFeatured?: boolean }) => {
+  const [cardRef, cardIntersecting, cardHasIntersected] = useIntersectionObserver()
+  
+  return (
+    <div 
+      ref={cardRef}
+      className={`group rounded-${isFeatured ? '2xl' : 'xl'} bg-card ${isFeatured ? 'p-8' : 'p-6'} shadow-sm border border-border/50 hover:shadow-${isFeatured ? 'lg' : 'md'} transition-all duration-500 hover:scale-[1.02] ${
+        cardHasIntersected 
+          ? 'opacity-100 translate-y-0 rotate-0' 
+          : 'opacity-0 translate-y-8 rotate-1'
+      }`}
+      style={{
+        transitionDelay: `${index * 100}ms`
+      }}
+    >
+      {/* Project Image */}
+      <div className={`mb-${isFeatured ? '6' : '4'} h-${isFeatured ? '64' : '48'} bg-gradient-to-br from-primary/${isFeatured ? '10' : '5'} to-purple-500/${isFeatured ? '10' : '5'} rounded-${isFeatured ? 'xl' : 'lg'} overflow-hidden border border-border/50 relative`}>
+        {project.image && !project.image.includes('placeholder') ? (
+          <Image
+            src={project.image}
+            alt={project.title}
+            fill
+            className='object-cover hover:scale-105 transition-transform duration-300'
+            sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+          />
+        ) : (
+          <div className='w-full h-full flex items-center justify-center'>
+            <Eye className={`h-${isFeatured ? '12' : '8'} w-${isFeatured ? '12' : '8'} text-muted-foreground`} />
+          </div>
+        )}
+      </div>
+
+      {/* Project Info */}
+      <div className={`mb-${isFeatured ? '4' : '2'} flex items-center justify-between`}>
+        <div className='flex items-center gap-3'>
+          <h3 className={`text-${isFeatured ? 'xl' : 'lg'} font-semibold group-hover:text-primary transition-colors`}>{project.title}</h3>
+          {isFeatured && (
+            <span className={`rounded-full px-2 py-1 text-xs font-medium ${
+              project.status === 'Live' 
+                ? 'bg-green-500/10 text-green-500' 
+                : 'bg-orange-500/10 text-orange-500'
+            }`}>
+              {project.status}
+            </span>
+          )}
+        </div>
+        {!isFeatured && (
+          <span className={`rounded-full px-2 py-1 text-xs font-medium ${
+            project.status === 'Live' 
+              ? 'bg-green-500/10 text-green-500' 
+              : 'bg-orange-500/10 text-orange-500'
+          }`}>
+            {project.status}
+          </span>
+        )}
+      </div>
+
+      {isFeatured ? (
+        <span className='rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary'>
+          {project.category}
+        </span>
+      ) : (
+        <span className='mb-3 inline-block rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary'>
+          {project.category}
+        </span>
+      )}
+
+      <p className={`mb-${isFeatured ? '6' : '4'} text-${isFeatured ? 'base' : 'sm'} text-muted-foreground leading-relaxed`}>{project.description}</p>
+
+      {/* Stats - Featured projects only */}
+      {isFeatured && (
+        <div className='mb-6 grid grid-cols-3 gap-4'>
+          {Object.entries(project.stats).map(([key, value]) => {
+            // Extract number for animation
+            const numericValue = typeof value === 'string' ? parseInt(value.replace(/\D/g, '')) || 0 : value
+            const suffix = typeof value === 'string' ? value.replace(/^\d+/, '') : ''
+            
+            return (
+              <div key={key} className='text-center'>
+                <AnimatedCounter end={numericValue} suffix={suffix} />
+                <div className='text-xs text-muted-foreground capitalize'>{key}</div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Technologies */}
+      <div className={`mb-${isFeatured ? '6' : '4'} flex flex-wrap gap-${isFeatured ? '2' : '1'}`}>
+        {(isFeatured ? project.technologies : project.technologies.slice(0, 4)).map((tech: string) => (
+          <span key={tech} className={`rounded-full bg-secondary/50 px-${isFeatured ? '3' : '2'} py-1 text-xs font-medium hover:bg-primary/20 hover:text-primary hover:scale-105 transition-all duration-300 cursor-default`}>
+            {tech}
+          </span>
+        ))}
+        {!isFeatured && project.technologies.length > 4 && (
+          <span className='rounded-full bg-secondary/50 px-2 py-1 text-xs font-medium'>
+            +{project.technologies.length - 4}
+          </span>
+        )}
+      </div>
+
+      {/* Links */}
+      <div className={`flex gap-${isFeatured ? '4' : '2'}`}>
+        {project.liveUrl && (
+          <a
+            href={project.liveUrl}
+            target='_blank'
+            rel='noopener noreferrer'
+            className={`inline-flex items-center gap-${isFeatured ? '2' : '1'} rounded-${isFeatured ? 'lg' : 'md'} bg-primary px-${isFeatured ? '4' : '3'} py-${isFeatured ? '2' : '1.5'} text-${isFeatured ? 'sm' : 'xs'} font-medium text-primary-foreground hover:bg-primary/90 transition-colors hover:scale-105 duration-200`}
+          >
+            <ExternalLink className={`h-${isFeatured ? '4' : '3'} w-${isFeatured ? '4' : '3'}`} />
+            {isFeatured ? 'Link' : 'Live'}
+          </a>
+        )}
+        {project.githubUrl && (
+          <a
+            href={project.githubUrl}
+            target='_blank'
+            rel='noopener noreferrer'
+            className={`inline-flex items-center gap-${isFeatured ? '2' : '1'} rounded-${isFeatured ? 'lg' : 'md'} border border-border bg-background px-${isFeatured ? '4' : '3'} py-${isFeatured ? '2' : '1.5'} text-${isFeatured ? 'sm' : 'xs'} font-medium hover:bg-accent transition-colors hover:scale-105 duration-200`}
+          >
+            <Github className={`h-${isFeatured ? '4' : '3'} w-${isFeatured ? '4' : '3'}`} />
+            {isFeatured ? 'Source Code' : 'Code'}
+          </a>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function Projects() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [selectedStatus, setSelectedStatus] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
+  const [headerRef, headerIntersecting, headerHasIntersected] = useIntersectionObserver()
+  const [filtersRef, filtersIntersecting, filtersHasIntersected] = useIntersectionObserver()
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const filteredProjects = projects.filter(project => {
     const matchesCategory = selectedCategory === 'All' || project.category === selectedCategory
@@ -198,11 +402,42 @@ export default function Projects() {
   const regularProjects = filteredProjects.filter(project => !project.featured)
 
   return (
-    <div className='container mx-auto px-4 py-12'>
-      <div className='mx-auto max-w-7xl'>
+    <div className='container mx-auto px-4 py-12 relative overflow-hidden'>
+      {/* Floating background elements */}
+      <div className='absolute inset-0 overflow-hidden pointer-events-none'>
+        <div 
+          className='absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/20 via-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-float'
+          style={{
+            transform: `translateY(${scrollY * 0.1}px) rotate(${scrollY * 0.05}deg)`
+          }}
+        ></div>
+        <div 
+          className='absolute top-1/2 -left-40 w-60 h-60 bg-gradient-to-br from-blue-500/20 via-primary/20 to-purple-500/20 rounded-full blur-3xl animate-float-delayed'
+          style={{
+            transform: `translateY(${scrollY * 0.15}px) rotate(${-scrollY * 0.03}deg)`
+          }}
+        ></div>
+        <div 
+          className='absolute -bottom-40 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-primary/20 rounded-full blur-3xl animate-float-slow'
+          style={{
+            transform: `translateY(${scrollY * 0.08}px) rotate(${scrollY * 0.02}deg)`
+          }}
+        ></div>
+      </div>
+
+      <div className='mx-auto max-w-7xl relative z-10'>
         {/* Header */}
-        <div className='mb-16 text-center'>
-          <h1 className='mb-6 text-4xl font-bold lg:text-5xl'>My Projects</h1>
+        <div 
+          ref={headerRef}
+          className={`mb-16 text-center transition-all duration-1000 ${
+            headerHasIntersected 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-8'
+          }`}
+        >
+          <h1 className='mb-6 text-4xl font-bold lg:text-5xl bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient-x'>
+            My Projects
+          </h1>
           <p className='mx-auto max-w-3xl text-xl text-muted-foreground leading-relaxed'>
             A showcase of my recent work spanning Web3, AI/ML, and full-stack development.
             Each project represents a unique challenge and innovative solution.
@@ -210,7 +445,14 @@ export default function Projects() {
         </div>
 
         {/* Search and Filters */}
-        <div className='mb-12 space-y-6'>
+        <div 
+          ref={filtersRef}
+          className={`mb-12 space-y-6 transition-all duration-1000 delay-200 ${
+            filtersHasIntersected 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-8'
+          }`}
+        >
           {/* Search Bar */}
           <div className='relative mx-auto max-w-md'>
             <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
@@ -281,89 +523,8 @@ export default function Projects() {
           <div className='mb-16'>
             <h2 className='mb-8 text-2xl font-semibold'>Featured Projects</h2>
             <div className='grid gap-8 lg:grid-cols-2'>
-              {featuredProjects.map((project) => (
-                <div key={project.id} className='group rounded-2xl bg-card p-8 shadow-sm border border-border/50 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]'>
-                  {/* Project Image */}
-                  <div className='mb-6 h-64 bg-gradient-to-br from-primary/10 to-purple-500/10 rounded-xl overflow-hidden border border-border/50 relative'>
-                    {project.image && !project.image.includes('placeholder') ? (
-                      <Image
-                        src={project.image}
-                        alt={project.title}
-                        fill
-                        className='object-cover hover:scale-105 transition-transform duration-300'
-                        sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
-                      />
-                    ) : (
-                      <div className='w-full h-full flex items-center justify-center'>
-                        <Eye className='h-12 w-12 text-muted-foreground' />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Project Info */}
-                  <div className='mb-4 flex items-center justify-between'>
-                    <div className='flex items-center gap-3'>
-                      <h3 className='text-xl font-semibold group-hover:text-primary transition-colors'>{project.title}</h3>
-                      <span className={`rounded-full px-2 py-1 text-xs font-medium ${
-                        project.status === 'Live' 
-                          ? 'bg-green-500/10 text-green-500' 
-                          : 'bg-orange-500/10 text-orange-500'
-                      }`}>
-                        {project.status}
-                      </span>
-                    </div>
-                    <span className='rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary'>
-                      {project.category}
-                    </span>
-                  </div>
-
-                  <p className='mb-6 text-muted-foreground leading-relaxed'>{project.description}</p>
-
-                  {/* Stats */}
-                  <div className='mb-6 grid grid-cols-3 gap-4'>
-                    {Object.entries(project.stats).map(([key, value]) => (
-                      <div key={key} className='text-center'>
-                        <div className='text-lg font-bold text-primary'>{value}</div>
-                        <div className='text-xs text-muted-foreground capitalize'>{key}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Technologies */}
-                  <div className='mb-6 flex flex-wrap gap-2'>
-                    {project.technologies.map((tech) => (
-                      <span key={tech} className='rounded-full bg-secondary/50 px-3 py-1 text-xs font-medium'>
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Links */}
-                  <div className='flex gap-4'>
-                    {project.liveUrl && (
-                      <a
-                        href={project.liveUrl}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors'
-                      >
-                        <ExternalLink className='h-4 w-4' />
-                        Link
-                      </a>
-                    )}
-                    {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='inline-flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-accent transition-colors'
-                      >
-                        <Github className='h-4 w-4' />
-                        Source Code
-                      </a>
-                    )}
-                  </div>
-                </div>
+              {featuredProjects.map((project, index) => (
+                <ProjectCard key={project.id} project={project} index={index} isFeatured={true} />
               ))}
             </div>
           </div>
@@ -374,83 +535,8 @@ export default function Projects() {
           <div>
             <h2 className='mb-8 text-2xl font-semibold'>All Projects</h2>
             <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
-              {regularProjects.map((project) => (
-                <div key={project.id} className='group rounded-xl bg-card p-6 shadow-sm border border-border/50 hover:shadow-md transition-all duration-300 hover:scale-[1.02]'>
-                  {/* Project Image */}
-                  <div className='mb-4 h-48 bg-gradient-to-br from-primary/5 to-purple-500/5 rounded-lg overflow-hidden border border-border/50 relative'>
-                    {project.image && !project.image.includes('placeholder') ? (
-                      <Image
-                        src={project.image}
-                        alt={project.title}
-                        fill
-                        className='object-cover hover:scale-105 transition-transform duration-300'
-                        sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
-                      />
-                    ) : (
-                      <div className='w-full h-full flex items-center justify-center'>
-                        <Eye className='h-8 w-8 text-muted-foreground' />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Project Info */}
-                  <div className='mb-2 flex items-center justify-between'>
-                    <h3 className='text-lg font-semibold group-hover:text-primary transition-colors'>{project.title}</h3>
-                    <span className={`rounded-full px-2 py-1 text-xs font-medium ${
-                      project.status === 'Live' 
-                        ? 'bg-green-500/10 text-green-500' 
-                        : 'bg-orange-500/10 text-orange-500'
-                    }`}>
-                      {project.status}
-                    </span>
-                  </div>
-
-                  <span className='mb-3 inline-block rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary'>
-                    {project.category}
-                  </span>
-
-                  <p className='mb-4 text-sm text-muted-foreground leading-relaxed'>{project.description}</p>
-
-                  {/* Technologies */}
-                  <div className='mb-4 flex flex-wrap gap-1'>
-                    {project.technologies.slice(0, 4).map((tech) => (
-                      <span key={tech} className='rounded-full bg-secondary/50 px-2 py-1 text-xs font-medium'>
-                        {tech}
-                      </span>
-                    ))}
-                    {project.technologies.length > 4 && (
-                      <span className='rounded-full bg-secondary/50 px-2 py-1 text-xs font-medium'>
-                        +{project.technologies.length - 4}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Links */}
-                  <div className='flex gap-2'>
-                    {project.liveUrl && (
-                      <a
-                        href={project.liveUrl}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors'
-                      >
-                        <ExternalLink className='h-3 w-3' />
-                        Live
-                      </a>
-                    )}
-                    {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent transition-colors'
-                      >
-                        <Github className='h-3 w-3' />
-                        Code
-                      </a>
-                    )}
-                  </div>
-                </div>
+              {regularProjects.map((project, index) => (
+                <ProjectCard key={project.id} project={project} index={index + featuredProjects.length} isFeatured={false} />
               ))}
             </div>
           </div>

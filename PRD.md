@@ -85,38 +85,60 @@ Create a revolutionary portfolio website that transcends traditional boundaries 
 
 #### 4.2 Advanced Features (Phase 2)
 
-##### 4.2.1 Web3 Integration & NFT Minting
+##### 4.2.1 AI-Powered NFT Creation Showcase
+- **Interactive NFT Studio** integrated into the About page
+- **Base Image:** Thomas's portrait (`public/thomasPict.jpg`) as the foundation
+- **AI Transformation Engine** using Stable Diffusion for style transfer
+- **Visual Effects Pipeline** inspired by advanced CSS/WebGL effects:
+  - Holographic overlays and glitch effects
+  - Particle systems and dynamic lighting
+  - Color grading and artistic filters
+  - 3D depth effects and parallax layers
+- **User Prompt Interface** allowing custom transformation requests
+- **Real-time Preview** with before/after comparison
+- **NFT Minting Capability** for generated artworks
+
+**Core Features:**
+- **Prompt-Based Generation:** Users input creative prompts to transform the portrait
+- **Style Presets:** Pre-defined artistic styles (cyberpunk, watercolor, abstract, etc.)
+- **Effect Combinations:** Layer multiple visual effects for unique results
+- **Interactive Controls:** Real-time adjustment of generation parameters
+- **Gallery Showcase:** Display of previously generated NFTs
+- **Minting Interface:** One-click NFT creation with metadata
+
+##### 4.2.2 Web3 Integration & Blockchain
 - **Wallet Connection** using RainbowKit/WalletConnect
-- **NFT Minting Interface** for portfolio pieces
 - **Smart Contract Integration** using Wagmi/Viem
-- **Blockchain Network Support** (Ethereum, Polygon)
-- **Transaction History** display
+- **Hoodi Network Support** (chainId: 560048) exclusively
+- **NFT Minting Interface** for AI-generated portraits
+- **Transaction History** display with status tracking
 - **Gas fee estimation** and optimization
-- **MetaMask integration** with error handling
+- **MetaMask integration** with comprehensive error handling
 
 **Technical Requirements:**
-- Solidity smart contracts using OpenZeppelin libraries
-- IPFS integration for metadata storage
-- Web3 wallet authentication
-- Real-time transaction status updates
-- Error handling for failed transactions
+- Solidity smart contracts using OpenZeppelin ERC-721 libraries
+- IPFS integration for NFT metadata and image storage
+- Web3 wallet authentication and session management
+- Real-time transaction status updates with user feedback
+- Error handling for failed transactions and network issues
+- Smart contract deployment on Hoodi network
 
-##### 4.2.2 AI-Powered Image Generation
-- **Stable Diffusion Integration** for portrait-based art generation
-- **Custom Model Training** using Thomas's portrait as base
-- **Interactive Generation Interface** with parameter controls
-- **Gallery of Generated Images** with download options
-- **Prompt Engineering Tools** for users
-- **Real-time Generation Status** with progress indicators
+##### 4.2.3 Advanced Visual Effects System
+- **WebGL Shaders** for real-time image processing
+- **CSS Filter Effects** for artistic transformations
+- **Canvas API Integration** for custom drawing operations
+- **Three.js Integration** for 3D effects and animations
+- **Performance Optimization** for mobile devices
+- **Fallback Systems** for browsers without WebGL support
 
-**Technical Requirements:**
-- Stable Diffusion API integration
-- Image processing and optimization
-- Secure API key management
-- Rate limiting and usage tracking
-- Image storage and CDN delivery
+**Effect Categories:**
+- **Holographic Effects:** Rainbow gradients, prismatic distortions
+- **Glitch Art:** Digital corruption, datamoshing, pixel sorting
+- **Particle Systems:** Dynamic overlays, energy fields, magic dust
+- **Color Grading:** Cinematic filters, vintage looks, neon aesthetics
+- **3D Transformations:** Depth maps, parallax scrolling, perspective shifts
 
-##### 4.2.3 3D Interactive Elements
+##### 4.2.4 3D Interactive Elements
 - **Three.js Scene Management** with optimized rendering
 - **Interactive 3D Models** representing projects/skills
 - **Particle Systems** for visual effects
@@ -214,10 +236,13 @@ Create a revolutionary portfolio website that transcends traditional boundaries 
 - SEO implementation
 
 #### Phase 3: Advanced Features (Weeks 7-10)
-- Web3 wallet integration
-- NFT minting functionality
-- AI image generation feature
-- Advanced 3D interactions
+- AI-powered NFT creation studio integration
+- Web3 wallet connection (RainbowKit)
+- Smart contract development and deployment (Hoodi network)
+- Stable Diffusion API integration for image transformation
+- Visual effects system (holographic, glitch, particle effects)
+- NFT minting interface with IPFS metadata storage
+- Advanced 3D interactions and WebGL shaders
 - Testing and bug fixes
 
 #### Phase 4: Polish & Deploy (Weeks 11-12)
