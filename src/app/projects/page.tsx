@@ -172,10 +172,27 @@ const projects = [
       proposals: '50+',
       tvl: '$100K+'
     }
+  },
+  {
+    id: 11,
+    title: 'AWS Continuous Development Pipeline',
+    description: 'Enterprise-grade CI/CD pipeline implementation using AWS services. Automated deployment workflows with comprehensive testing, monitoring, and rollback capabilities for scalable applications.',
+    image: '/images/aws-pipeline.png',
+    category: 'Tools & DevOps',
+    status: 'Completed',
+    featured: false,
+    technologies: ['AWS CodePipeline', 'AWS CodeBuild', 'AWS CodeDeploy', 'CloudFormation', 'Lambda', 'S3', 'CloudWatch', 'ECR', 'ECS', 'Terraform'],
+    liveUrl: null,
+    githubUrl: null,
+    stats: {
+      deployments: '500+',
+      uptime: '99.9%',
+      environments: '3+'
+    }
   }
 ]
 
-const categories = ['All', 'E-Commerce', 'Science & Research', 'Web3', 'Health & Wellness', 'Social Platform', 'Civic Tech', 'Education', 'Professional Experience', 'Arduino Dev']
+const categories = ['All', 'E-Commerce', 'Science & Research', 'Web3', 'Health & Wellness', 'Social Platform', 'Civic Tech', 'Education', 'Professional Experience', 'Arduino Dev', 'Tools & DevOps']
 const statuses = ['All', 'Completed', 'Archived', 'On going']
 
 // Custom hook for intersection observer (reused from About page)
