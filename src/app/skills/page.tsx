@@ -35,9 +35,12 @@ import {
   SiJavascript,
   SiCss3,
   SiHtml5,
-  SiEthereum
+  SiEthereum,
+  SiAmazonaws,
+  SiAmazons3,
+  SiAwslambda
 } from 'react-icons/si'
-import { FaAccessibleIcon, FaDatabase, FaCode, FaTools } from 'react-icons/fa'
+import { FaAccessibleIcon, FaDatabase, FaCode, FaTools, FaRocket, FaChartLine } from 'react-icons/fa'
 
 // Dynamic import for Three.js component to avoid SSR issues
 const SkillsHero = dynamic(() => import('@/components/three/SkillsHero'), {
@@ -227,6 +230,30 @@ const skillCategories = [
         level: 75,
         description: 'Unit testing & test-driven development',
         icon: SiJest,
+      },
+      {
+        name: 'AWS CodeDeploy',
+        level: 87,
+        description: 'Automated application deployment',
+        icon: FaRocket,
+      },
+      {
+        name: 'AWS Lambda',
+        level: 80,
+        description: 'Serverless functions & automation',
+        icon: SiAwslambda,
+      },
+      {
+        name: 'AWS S3',
+        level: 88,
+        description: 'Object storage & static hosting',
+        icon: SiAmazons3,
+      },
+      {
+        name: 'CloudWatch',
+        level: 84,
+        description: 'Monitoring, logging & alerting',
+        icon: FaChartLine,
       },
     ],
   },
@@ -418,7 +445,7 @@ export default function Skills() {
               <div className='text-sm text-muted-foreground'>Categories</div>
             </div>
             <div className='rounded-xl border border-green-500/20 bg-gradient-to-r from-green-500/10 to-emerald-500/10 p-6 text-center'>
-              <div className='mb-2 text-3xl font-bold text-green-500'>30+</div>
+              <div className='mb-2 text-3xl font-bold text-green-500'>38+</div>
               <div className='text-sm text-muted-foreground'>Technologies</div>
             </div>
             <div className='rounded-xl border border-purple-500/20 bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-6 text-center'>
