@@ -13,9 +13,11 @@ import {
   Settings,
   Eye,
   EyeOff,
-  Loader2
+  Loader2,
+  Wallet
 } from 'lucide-react'
 import VisualEffects from './VisualEffects'
+import WalletConnection from '../web3/WalletConnection'
 
 // Visual effect presets
 const effectPresets = [
@@ -95,6 +97,7 @@ export default function NFTStudio() {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null)
   const [showOriginal, setShowOriginal] = useState(true)
   const [showEffects, setShowEffects] = useState(false)
+  const [isWalletConnected, setIsWalletConnected] = useState(false)
   const [studioRef, studioIntersecting, studioHasIntersected] = useIntersectionObserver()
 
   // Simulate AI image generation (placeholder for Stable Diffusion integration)
@@ -307,6 +310,15 @@ export default function NFTStudio() {
             </ul>
           </div>
 
+          {/* Web3 Wallet Connection */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Wallet className="h-5 w-5 text-primary" />
+              Web3 Wallet
+            </h3>
+            <WalletConnection onConnectionChange={setIsWalletConnected} />
+          </div>
+
           {/* Action Buttons */}
           {generatedImage && !isGenerating && (
             <div className="flex gap-3">
@@ -314,7 +326,10 @@ export default function NFTStudio() {
                 <Download className="h-5 w-5" />
                 Download
               </button>
-              <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-border rounded-xl hover:bg-accent transition-colors">
+              <button 
+                disabled={!isWalletConnected}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
+              >
                 <Share2 className="h-5 w-5" />
                 Mint NFT
               </button>

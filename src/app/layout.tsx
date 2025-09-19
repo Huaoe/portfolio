@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme/theme-provider'
 import { MainLayout } from '@/components/layout/main-layout'
+import Web3Provider from '@/components/web3/Web3Provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -65,7 +66,9 @@ export default function RootLayout({
           defaultTheme='system'
           storageKey='portfolio-ui-theme'
         >
-          <MainLayout>{children}</MainLayout>
+          <Web3Provider>
+            <MainLayout>{children}</MainLayout>
+          </Web3Provider>
         </ThemeProvider>
       </body>
     </html>
