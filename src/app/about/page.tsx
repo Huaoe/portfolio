@@ -1,7 +1,17 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Calendar, MapPin, Award, Code, Lightbulb, Sparkles, Zap } from 'lucide-react'
+import Image from 'next/image'
+import { Download, Calendar, MapPin, Award, Code, Sparkles, Lightbulb, Zap } from 'lucide-react'
+import dynamic from 'next/dynamic'
+
+// Dynamic import for NFT Studio to avoid SSR issues
+const NFTStudio = dynamic(() => import('@/components/nft/NFTStudio'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-96 animate-pulse bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl" />
+  )
+})
 
 const experiences = [
   {
@@ -451,6 +461,9 @@ export default function About() {
               ))}
             </div>
           </div>
+
+          {/* AI-Powered NFT Studio */}
+          <NFTStudio />
         </div>
       </div>
     </div>
