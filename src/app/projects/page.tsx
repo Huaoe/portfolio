@@ -69,8 +69,8 @@ const projects = [
     githubUrl: null,
     stats: {
       users: '10K+',
-      transactions: '5K+',
-      uptime: '99.9%'
+      team: '25+ devs',
+      transactions: '25K+'
     }
   },
   {

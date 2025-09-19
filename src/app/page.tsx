@@ -198,7 +198,7 @@ export default function Home() {
           <p className='mx-auto max-w-3xl text-lg text-muted-foreground'>
             I'm a passionate full-stack developer with expertise in{' '}
             <br></br>  <MatrixText>modern web technologies</MatrixText>. <br></br>
-            I love creating immersive digital experiences that push the boundaries of what's possible on the web.
+            I love creating immersive digital experiences that push the boundaries of what's possible on the web & beyond ~&gt;
           </p>
         </div>
       </section>

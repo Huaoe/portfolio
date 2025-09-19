@@ -239,6 +239,7 @@ export default function Contact() {
                 />
               </div>
               
+              <div className='flex flex-col items-center space-y-2'>
               <button
                 type='submit'
                 disabled={isLoading}
@@ -251,12 +252,12 @@ export default function Contact() {
                   </>
                 ) : (
                   <>
-                    <Send className='mr-2 h-4 w-4' />
+                    <Send className='mr-2 h-4 w-4 self-center' />
                     Send Message
                   </>
                 )}
               </button>
-              
+              </div>
               {/* Success/Error Messages */}
               {submitStatus === 'success' && (
                 <div className='flex items-center gap-2 rounded-md bg-green-50 p-3 text-green-800 border border-green-200'>
