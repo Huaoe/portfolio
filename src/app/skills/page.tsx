@@ -14,7 +14,6 @@ import {
   SiPostgresql,
   SiMongodb,
   SiGraphql,
-  SiMicrosoftsqlserver,
   SiSymfony,
   SiDjango,
   SiFirebase,

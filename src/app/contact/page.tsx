@@ -3,16 +3,11 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import emailjs from '@emailjs/browser'
-import dynamic from 'next/dynamic'
 import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle, Loader2, Shield } from 'lucide-react'
+import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 
-// @ts-ignore - Temporary fix for TypeScript compatibility
-const ReCAPTCHA = dynamic(() => import('react-google-recaptcha'), {
-  ssr: false,
-  loading: () => <div className="h-20 w-80 bg-gray-100 animate-pulse rounded"></div>
-})
-
-export default function Contact() {
+function ContactForm() {
+  const { executeRecaptcha } = useGoogleReCaptcha()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -23,7 +18,6 @@ export default function Contact() {
   const [isLoading, setIsLoading] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
-  const [captchaValue, setCaptchaValue] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,16 +25,26 @@ export default function Contact() {
     setSubmitStatus('idle')
     setErrorMessage('')
 
-    // Check if CAPTCHA is completed
-    if (!captchaValue) {
+    // Execute reCAPTCHA v3
+    if (!executeRecaptcha) {
       setSubmitStatus('error')
-      setErrorMessage('Please complete the CAPTCHA verification.')
+      setErrorMessage('reCAPTCHA not available. Please try again.')
       setIsLoading(false)
       return
     }
 
     try {
-      // EmailJS configuration - you'll need to replace these with your actual values
+      // Get reCAPTCHA token
+      const token = await executeRecaptcha('contact_form')
+      
+      if (!token) {
+        setSubmitStatus('error')
+        setErrorMessage('reCAPTCHA verification failed. Please try again.')
+        setIsLoading(false)
+        return
+      }
+
+      // EmailJS configuration
       const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'your_service_id'
       const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'your_template_id'
       const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'your_public_key'
@@ -50,7 +54,8 @@ export default function Contact() {
         from_email: formData.email,
         subject: formData.subject,
         message: formData.message,
-        to_name: 'Thomas Berrod', // Your name
+        to_name: 'Thomas Berrod',
+        recaptcha_token: token, // Include the reCAPTCHA token
       }
 
       await emailjs.send(serviceId, templateId, templateParams, publicKey)
@@ -63,14 +68,10 @@ export default function Contact() {
         subject: '',
         message: ''
       })
-      // Reset CAPTCHA
-      setCaptchaValue(null)
     } catch (error) {
       console.error('EmailJS error:', error)
       setSubmitStatus('error')
       setErrorMessage('Failed to send message. Please try again or contact me directly.')
-      // Reset CAPTCHA on error
-      setCaptchaValue(null)
     } finally {
       setIsLoading(false)
     }
@@ -225,18 +226,12 @@ export default function Contact() {
                 />
               </div>
               
-              {/* reCAPTCHA */}
+              {/* reCAPTCHA v3 Info */}
               <div className='flex flex-col items-center space-y-2'>
                 <div className='flex items-center gap-2 text-sm text-muted-foreground mb-2'>
                   <Shield className='h-4 w-4' />
-                  <span>Security verification required</span>
+                  <span>Protected by reCAPTCHA v3</span>
                 </div>
-                <ReCAPTCHA
-                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || 'your_site_key_here'}
-                  onChange={(value) => setCaptchaValue(value)}
-                  onExpired={() => setCaptchaValue(null)}
-                  theme='light'
-                />
               </div>
               
               <div className='flex flex-col items-center space-y-2'>
@@ -278,5 +273,26 @@ export default function Contact() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function Contact() {
+  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+
+  if (!recaptchaSiteKey) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Configuration Error</h1>
+          <p className="text-muted-foreground">reCAPTCHA site key is not configured.</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
+      <ContactForm />
+    </GoogleReCaptchaProvider>
   )
 }

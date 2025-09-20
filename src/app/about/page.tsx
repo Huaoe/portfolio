@@ -156,16 +156,22 @@ const useIntersectionObserver = (options = {}) => {
 }
 
 // Animated counter component
-const AnimatedCounter = ({ end, duration = 2000, suffix = '' }) => {
+interface AnimatedCounterProps {
+  end: number
+  duration?: number
+  suffix?: string
+}
+
+const AnimatedCounter = ({ end, duration = 2000, suffix = '' }: AnimatedCounterProps) => {
   const [count, setCount] = useState(0)
   const [ref, isIntersecting, hasIntersected] = useIntersectionObserver()
 
   useEffect(() => {
     if (hasIntersected) {
-      let startTime = null
+      let startTime: number | null = null
       const startCount = 0
       
-      const animate = (currentTime) => {
+      const animate = (currentTime: number) => {
         if (startTime === null) startTime = currentTime
         const progress = Math.min((currentTime - startTime) / duration, 1)
         

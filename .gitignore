@@ -46,5 +46,5 @@ next-env.d.ts
 Thumbs.db
 
 # Arweave wallet files (keep these secure!)
-*.json
+# *.json - commented out to allow package.json access
 m9IQRGB5bDhqbSPsRztxRS4E0SCuosig52-Cs-j27HE.json
