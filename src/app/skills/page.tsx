@@ -322,85 +322,104 @@ export default function Skills() {
   }, [])
 
   return (
-    <div className='min-h-screen'>
+    <div className='min-h-screen bg-gradient-to-b from-background via-background to-muted/20'>
       {/* Three.js Animated Header */}
       <SkillsHero />
 
       {/* Skills Content */}
-      <div className='container mx-auto px-4 py-16'>
+      <div className='container mx-auto px-6 py-20 lg:px-8'>
         <div className='mx-auto max-w-7xl'>
+          {/* Section Header */}
+          <div className='mb-16 text-center'>
+            <h1 className='mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-4xl font-bold tracking-tight text-transparent md:text-5xl'>
+              Technical Expertise
+            </h1>
+            <p className='mx-auto max-w-2xl text-lg text-muted-foreground'>
+              A comprehensive overview of my professional skills and proficiency levels across various technologies and domains.
+            </p>
+          </div>
+
           {/* Skills Grid */}
-          <div className='grid gap-8 lg:grid-cols-2'>
+          <div className='grid gap-8 lg:grid-cols-2 xl:gap-10'>
             {skillCategories.map((category, categoryIndex) => {
               const IconComponent = category.icon
               return (
                 <div
                   key={categoryIndex}
-                  className='rounded-2xl border border-border/50 bg-card p-8 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg'
+                  className='group relative overflow-hidden rounded-2xl border border-border/40 bg-card/50 p-8 shadow-lg backdrop-blur-sm transition-all duration-500 hover:border-border/60 hover:shadow-2xl hover:shadow-primary/5'
                 >
+                  {/* Subtle gradient overlay */}
+                  <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100' />
+                  
                   {/* Category Header */}
-                  <div className='mb-8 flex items-center gap-4'>
+                  <div className='relative mb-10 flex items-center gap-4'>
                     <div
-                      className={`rounded-xl bg-gradient-to-r ${category.color} p-3`}
+                      className={`flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${category.color} shadow-lg shadow-primary/20 transition-transform duration-300 group-hover:scale-110`}
                     >
-                      <IconComponent className='h-6 w-6 text-white' />
+                      <IconComponent className='h-7 w-7 text-white' />
                     </div>
-                    <h2 className='text-2xl font-semibold'>
-                      {category.category}
-                    </h2>
+                    <div>
+                      <h2 className='text-2xl font-bold tracking-tight text-foreground'>
+                        {category.category}
+                      </h2>
+                      <p className='mt-1 text-sm text-muted-foreground'>
+                        {category.skills.length} technologies
+                      </p>
+                    </div>
                   </div>
 
                   {/* Skills List */}
-                  <div className='space-y-6'>
+                  <div className='relative space-y-7'>
                     {category.skills.map((skill, skillIndex) => (
-                      <div key={skillIndex} className='group'>
+                      <div key={skillIndex} className='group/skill'>
                         {/* Skill Header */}
-                        <div className='mb-2 flex items-center justify-between'>
-                          <div className='flex items-center gap-3'>
-                            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-muted/50'>
+                        <div className='mb-3 flex items-start justify-between gap-4'>
+                          <div className='flex flex-1 items-start gap-3'>
+                            <div className='flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-muted/60 ring-1 ring-border/50 transition-all duration-300 group-hover/skill:bg-muted group-hover/skill:ring-primary/30'>
                               {skill.icon && (
-                                <skill.icon className='h-5 w-5 text-primary' />
+                                <skill.icon className='h-5 w-5 text-foreground/70 transition-colors duration-300 group-hover/skill:text-primary' />
                               )}
                             </div>
-                            <div>
-                              <span className='font-semibold text-foreground'>
+                            <div className='flex-1 min-w-0'>
+                              <h3 className='font-semibold tracking-tight text-foreground transition-colors duration-300 group-hover/skill:text-primary'>
                                 {skill.name}
-                              </span>
-                              <p className='mt-1 text-sm text-muted-foreground'>
+                              </h3>
+                              <p className='mt-1 text-sm leading-relaxed text-muted-foreground'>
                                 {skill.description}
                               </p>
                             </div>
                           </div>
-                          <div className='text-right'>
-                            <span className='text-lg font-bold text-primary'>
-                              {skill.level}%
+                          <div className='flex-shrink-0 text-right'>
+                            <span className='text-xl font-bold tracking-tight text-foreground'>
+                              {skill.level}
+                              <span className='text-sm font-medium text-muted-foreground'>%</span>
                             </span>
                           </div>
                         </div>
 
                         {/* Animated Progress Bar */}
-                        <div className='relative h-3 overflow-hidden rounded-full bg-muted'>
+                        <div className='relative h-2.5 overflow-hidden rounded-full bg-muted/60 ring-1 ring-border/30'>
                           <div
-                            className={`absolute left-0 top-0 h-full bg-gradient-to-r ${category.color} rounded-full transition-all duration-1000 ease-out`}
+                            className={`absolute left-0 top-0 h-full rounded-full bg-gradient-to-r ${category.color} shadow-sm transition-all duration-1000 ease-out`}
                             style={{
                               width: isVisible ? `${skill.level}%` : '0%',
-                              transitionDelay: `${categoryIndex * 200 + skillIndex * 100}ms`,
+                              transitionDelay: `${categoryIndex * 150 + skillIndex * 80}ms`,
                             }}
                           >
                             {/* Shimmer effect */}
-                            <div className='animate-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent'></div>
+                            <div className='animate-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent' />
                           </div>
 
-                          {/* Skill level indicator */}
+                          {/* Skill level indicator dot */}
                           <div
-                            className='absolute top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-white shadow-sm transition-all duration-1000 ease-out'
+                            className='absolute top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-white shadow-md transition-all duration-1000 ease-out'
                             style={{
                               left: isVisible
-                                ? `calc(${skill.level}% - 4px)`
-                                : '-4px',
-                              transitionDelay: `${categoryIndex * 200 + skillIndex * 100 + 500}ms`,
+                                ? `calc(${skill.level}% - 3px)`
+                                : '-3px',
+                              transitionDelay: `${categoryIndex * 150 + skillIndex * 80 + 400}ms`,
                             }}
-                          ></div>
+                          />
                         </div>
                       </div>
                     ))}
@@ -411,25 +430,45 @@ export default function Skills() {
           </div>
 
           {/* Summary Stats */}
-          <div className='mt-16 grid gap-6 md:grid-cols-4'>
-            <div className='rounded-xl border border-blue-500/20 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 p-6 text-center'>
-              <div className='mb-2 text-3xl font-bold text-blue-500'>6+</div>
-              <div className='text-sm text-muted-foreground'>Categories</div>
-            </div>
-            <div className='rounded-xl border border-green-500/20 bg-gradient-to-r from-green-500/10 to-emerald-500/10 p-6 text-center'>
-              <div className='mb-2 text-3xl font-bold text-green-500'>30+</div>
-              <div className='text-sm text-muted-foreground'>Technologies</div>
-            </div>
-            <div className='rounded-xl border border-purple-500/20 bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-6 text-center'>
-              <div className='mb-2 text-3xl font-bold text-purple-500'>5+</div>
-              <div className='text-sm text-muted-foreground'>
-                Years Experience
+          <div className='mt-20 grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
+            <div className='group relative overflow-hidden rounded-xl border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-cyan-500/5 to-transparent p-8 text-center shadow-lg transition-all duration-300 hover:border-blue-500/40 hover:shadow-xl hover:shadow-blue-500/10'>
+              <div className='absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
+              <div className='relative'>
+                <div className='mb-3 bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-5xl font-bold tracking-tight text-transparent'>
+                  6+
+                </div>
+                <div className='text-sm font-medium uppercase tracking-wider text-muted-foreground'>Categories</div>
               </div>
             </div>
-            <div className='rounded-xl border border-orange-500/20 bg-gradient-to-r from-orange-500/10 to-red-500/10 p-6 text-center'>
-              <div className='mb-2 text-3xl font-bold text-orange-500'>85%</div>
-              <div className='text-sm text-muted-foreground'>
-                Avg. Proficiency
+            <div className='group relative overflow-hidden rounded-xl border border-green-500/20 bg-gradient-to-br from-green-500/5 via-emerald-500/5 to-transparent p-8 text-center shadow-lg transition-all duration-300 hover:border-green-500/40 hover:shadow-xl hover:shadow-green-500/10'>
+              <div className='absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
+              <div className='relative'>
+                <div className='mb-3 bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-5xl font-bold tracking-tight text-transparent'>
+                  30+
+                </div>
+                <div className='text-sm font-medium uppercase tracking-wider text-muted-foreground'>Technologies</div>
+              </div>
+            </div>
+            <div className='group relative overflow-hidden rounded-xl border border-purple-500/20 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-transparent p-8 text-center shadow-lg transition-all duration-300 hover:border-purple-500/40 hover:shadow-xl hover:shadow-purple-500/10'>
+              <div className='absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
+              <div className='relative'>
+                <div className='mb-3 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-5xl font-bold tracking-tight text-transparent'>
+                  20+
+                </div>
+                <div className='text-sm font-medium uppercase tracking-wider text-muted-foreground'>
+                  Years Experience
+                </div>
+              </div>
+            </div>
+            <div className='group relative overflow-hidden rounded-xl border border-orange-500/20 bg-gradient-to-br from-orange-500/5 via-red-500/5 to-transparent p-8 text-center shadow-lg transition-all duration-300 hover:border-orange-500/40 hover:shadow-xl hover:shadow-orange-500/10'>
+              <div className='absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
+              <div className='relative'>
+                <div className='mb-3 bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-5xl font-bold tracking-tight text-transparent'>
+                  85%
+                </div>
+                <div className='text-sm font-medium uppercase tracking-wider text-muted-foreground'>
+                  Avg. Proficiency
+                </div>
               </div>
             </div>
           </div>

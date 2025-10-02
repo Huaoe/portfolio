@@ -172,7 +172,7 @@ export default function Home() {
                 <ArrowRight className='ml-2 h-5 w-5 transition-transform group-hover:translate-x-1' />
               </Link>
               <Link 
-                href='/Thomas_Berrod_CV_2025_EN.pdf' 
+                href='/Thomas Berrod-cv-2025.pdf' 
                 target='_blank'
                 className='inline-flex items-center justify-center rounded-md border border-input bg-background/50 backdrop-blur-sm px-8 py-4 text-base font-medium shadow-lg transition-all hover:bg-accent hover:text-accent-foreground hover:shadow-xl hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
               >
