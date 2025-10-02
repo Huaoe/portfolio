@@ -250,7 +250,7 @@ const projects = [
       'jupiter',
       'Realms DAO',
     ],
-    liveUrl: null,
+    liveUrl: "https://elurc-dao.onrender.com/",
     githubUrl: null,
     stats: {
       holders: '1K+',
