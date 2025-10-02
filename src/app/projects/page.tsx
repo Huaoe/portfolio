@@ -35,7 +35,7 @@ const projects = [
     stats: {
       duration: '2+ years',
       team: '15+ devs',
-      platforms: 'Multi-device',
+      platforms: '3 Multi-device',
     },
   },
 
