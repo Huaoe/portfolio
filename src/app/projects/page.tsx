@@ -258,6 +258,32 @@ const projects = [
       tvl: '$100K+',
     },
   },
+  {
+    id: 11,
+    title: 'Breizh-ai.org',
+    description:
+      'A decentralized RAG platform for Breizhian history and culture. Deployed on Akash blockchain.',
+    image: '/images/coinElur512.png',
+    category: 'Web3',
+    status: 'Ongoing',
+    featured: false,
+    technologies: [
+      'React.js',
+      'Akash',
+      'Docker',
+      'Mistral',
+      'Pinecone',
+      'Supabase',
+      'TailwindCSS',
+      'ShadcnUI',
+    ],
+    liveUrl: "https://breizh-ai.org/",
+    githubUrl: null,
+    stats: {
+      visitors: '10K+',
+      interactions: '50k+'
+    },
+  },
 ]
 
 const categories = [
