@@ -123,7 +123,7 @@ const projects = [
     id: 4,
     title: 'Stimio.fr',
     description:
-      'Interactive platform for cognitive stimulation and brain training exercises. Features personalized training programs and progress tracking.',
+      'Study of railway pedal time series for the purpose of understanding and predicting problems.',
     image: '/images/stimio.png',
     category: 'Health & Wellness',
     status: 'Completed',
