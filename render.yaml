@@ -1,9 +1,17 @@
-services:
-  - type: web
-    name: portfolio
-    env: node
-    nodeVersion: "20"
-    plan: free
-    buildCommand: yarn install --frozen-lockfile && yarn build
-    startCommand: yarn start -- -p $PORT
-    autoDeploy: true
+# Exported from Render on 2026-03-20T10:33:15Z
+version: "1"
+projects:
+- name: Porfolio
+  environments:
+  - name: Production
+    services:
+    - type: web
+      name: portfolio
+      runtime: static
+      repo: https://github.com/Huaoe/portfolio
+      envVars:
+      - key: PORT
+        sync: false
+      buildCommand: yarn --frozen-lockfile install; yarn build
+      staticPublishPath: .next
+      autoDeployTrigger: commit
