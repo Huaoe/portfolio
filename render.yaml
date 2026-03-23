@@ -13,5 +13,5 @@ projects:
       - key: PORT
         sync: false
       buildCommand: yarn --frozen-lockfile install; yarn build
-      staticPublishPath: .next
+      staticPublishPath: out
       autoDeployTrigger: commit

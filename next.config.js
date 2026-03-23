@@ -7,13 +7,22 @@ const nextConfig = {
     ignoreDuringBuilds: false,
   },
   images: {
-    domains: ['localhost'],
+    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
     formats: ['image/webp', 'image/avif'],
   },
   webpack: (config) => {
     config.externals.push('pino-pretty', 'lokijs', 'encoding');
     return config;
   },
+  output: 'export',
+  trailingSlash: true,
+  distDir: 'out',
 }
 
 module.exports = nextConfig
