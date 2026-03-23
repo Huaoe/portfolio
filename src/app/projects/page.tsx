@@ -169,49 +169,6 @@ const projects = [
     },
   },
   {
-    id: 7,
-    title: 'Auray Petition',
-    description:
-      'Digital petition platform for local civic engagement. Revolutionary digital petition system for regulating church bell sounds in Auray.',
-    image: '/images/aurayPetition.png',
-    category: 'Civic Tech',
-    status: 'Completed',
-    featured: false,
-    technologies: [
-      'TypeScript',
-      'Next.js',
-      'Vercel',
-      'Supabase',
-      'TailwindCSS',
-      'ShadcnUI',
-    ],
-    liveUrl: 'https://auray-petition.vercel.app/',
-    githubUrl: 'https://github.com/Huaoe/auray-petition',
-    stats: {
-      signatures: '500+',
-      shares: '200+',
-      engagement: '85%',
-    },
-  },
-  {
-    id: 8,
-    title: 'Secularisation Gallery',
-    description:
-      'Interactive gallery showcasing the historical process of secularization through visual storytelling and data visualization.',
-    image: '/images/secularisation.png',
-    category: 'Education',
-    status: 'Ongoing',
-    featured: false,
-    technologies: ['React', 'D3.js', 'Next.js', 'Vercel', 'CSS3'],
-    liveUrl: 'https://secularization.vercel.app/gallery',
-    githubUrl: null,
-    stats: {
-      artifacts: '300+',
-      visitors: '1K+',
-      interactions: '5K+',
-    },
-  },
-  {
     id: 9,
     title: 'Star Wars Bee - Anti-Asian-Hornet Laser Defense System',
     description:
