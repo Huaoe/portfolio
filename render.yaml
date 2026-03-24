@@ -1,5 +1,6 @@
 # Exported from Render on 2026-03-20T10:33:15Z
-# Updated for static export deployment - no server needed
+# Static site deployment - no server runtime needed
+# Uses Next.js static export to generate HTML/CSS/JS files
 version: "1"
 projects:
 - name: Porfolio
@@ -10,9 +11,7 @@ projects:
       name: portfolio
       runtime: static
       repo: https://github.com/Huaoe/portfolio
-      envVars:
-      - key: PORT
-        sync: false
-      buildCommand: yarn --frozen-lockfile install; yarn build
+      buildCommand: yarn --frozen-lockfile install && yarn build
       staticPublishPath: out
       autoDeployTrigger: commit
+      # Static site configuration - no server needed
