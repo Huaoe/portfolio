@@ -9,8 +9,8 @@ projects:
     services:
     - type: web
       name: portfolio
-      runtime: static
+      runtime: node
       repo: https://github.com/Huaoe/portfolio
       buildCommand: yarn --frozen-lockfile install && yarn build
-      staticPublishPath: out
+      startCommand: yarn start
       autoDeployTrigger: commit

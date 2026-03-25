@@ -20,9 +20,6 @@ const nextConfig = {
     config.externals.push('pino-pretty', 'lokijs', 'encoding');
     return config;
   },
-  output: 'export',
-  trailingSlash: true,
-  distDir: 'out',
 }
 
 module.exports = nextConfig
