@@ -14,4 +14,3 @@ projects:
       buildCommand: yarn --frozen-lockfile install && yarn build
       staticPublishPath: out
       autoDeployTrigger: commit
-      # Static site configuration - no server needed
